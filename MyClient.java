@@ -15,6 +15,10 @@ public class MyClient{
     String largestServer = "";
 	int largestServerCount = 0;
 	int GetsAllCount = 0;
+	int core;
+	int memory;
+    int firstcapableserver;
+	int firstcapableID;
 	
 
 	
@@ -54,50 +58,80 @@ public class MyClient{
 			Lastmsg = this.din.readLine();
 			System.out.println("Server Message: " + Lastmsg);
 			job = Lastmsg.split("\\s+");
-
-			if(GetsAllCount == 0){
-				send("GETS All"); //send GETS message
+			if(job[0].equals("JOBN")){
+			send("GETS Avail" + " " + job[4] + " " + job[5] + " " + job[6]); 
+			serverMessage = this.din.readLine();
+			String[] serverData = serverMessage.split("\\s+");
+			if(serverData[1].equals("0")){
+			send("GETS Capable" + " " + job[4] + " " + job[5] + " " + job[6]); 
+			// send GETS message
+			serverMessage = this.din.readLine();
+			System.out.println("Server message " + serverMessage);
+			String[] serverList = serverMessage.split("\\s+");
+			int nRecs = Integer.parseInt(serverList[1]);
+            send("OK");
+			int countServer = 0;
+			for (int i = 0; i < nRecs; i += 1) {
 				serverMessage = this.din.readLine();
-				System.out.println("Server message " + serverMessage);
-				String[] serverList = serverMessage.split("\\s+");
-				int nRecs = Integer.parseInt(serverList[1]);
-				send("OK");
-				int serverType = 0;
-				for (int i = 0; i < nRecs; i += 1) {
-					serverMessage = this.din.readLine();
-					System.out.println("Server message " + serverMessage);
-					serverList = serverMessage.split("\\s+");
-					serverType = Integer.parseInt(serverList[4]);
-					if (serverType > largestServerType) {
-						largestServerType = serverType;
-						largestServer = serverList[0];
-						largestServerCount = 1;
-					}
-					else if(serverType == largestServerType){
-						if(serverList[0].equals(largestServer)){
-							largestServerCount ++;
-						}	
-					}
+				String[] serverInfo = serverMessage.split("\\s+");
+				if(countServer == 0){
+					servers = serverInfo[0] + " " +serverInfo[1];
+					countServer++;
+
+					// serverList = serverMessage.split("\\s+");
+					// serverType = Integer.parseInt(serverList[4]);
+					// if (serverType > largestServerType) {
+					// largestServerType = serverType;
+					// largestServer = serverList[0];
+					// largestServerCount = 1;
 				}
-				System.out.println(largestServer +" "+ Integer.toString(largestServerCount));
-				GetsAllCount++;
-				System.out.println(Integer.toString(GetsAllCount));
-				send("OK");
-				serverMessage = this.din.readLine();
+				else {
+					continue;	
+				}
 			}
+			}
+			else{
 
+			}	
+
+			// 	int serverType = 0;
+			// 	for (int i = 0; i < nRecs; i += 1) {
+			// 		serverMessage = this.din.readLine();
+			// 		System.out.println("Server message " + serverMessage);
+			// 		serverList = serverMessage.split("\\s+");
+			// 		serverType = Integer.parseInt(serverList[4]);
+			// 		if (serverType > largestServerType) {
+			// 			largestServerType = serverType;
+			// 			largestServer = serverList[0];
+			// 			largestServerCount = 1;
+			// 		}
+			// 		else if(serverType == largestServerType){
+			// 			if(serverList[0].equals(largestServer)){
+			// 				largestServerCount ++;
+			// 			}	
+			// 		}
+			// 	}
+				// System.out.println(largestServer +" "+ Integer.toString(largestServerCount));
+				// GetsAllCount++;
+				// System.out.println(Integer.toString(GetsAllCount));
+			send("OK");
+			serverMessage = this.din.readLine();
+			}
 			if(job[0].equals("JOBN")){ //schedule job
-				send("SCHD" + " " + job[2] +" " +largestServer + " " +Integer.toString(Integer.parseInt(job[2])%largestServerCount));
+				send("SCHD" + " " + job[2] +" " +servers);
 				Lastmsg = this.din.readLine();
 			}
 			if(job[0].equals("JCPL")){
 				continue;
-			}		
+			}	
 		}
+				
+		
 		send("QUIT");
 		this.din.readLine();
 	}
 }
+
 	
 
 
