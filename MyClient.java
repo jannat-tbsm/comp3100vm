@@ -15,8 +15,6 @@ public class MyClient{
     String largestServer = "";
 	int largestServerCount = 0;
 	int GetsAllCount = 0;
-	int core;
-	int memory;
     int firstcapableserver;
 	int firstcapableID;
 	
@@ -47,37 +45,37 @@ public class MyClient{
 
 	public void byClient() throws Exception{
 		this.send("HELO");
-	   	System.out.println(this.din.readLine());
+	   	this.din.readLine();
 		this.send("AUTH "+System.getProperty("user.name"));
-		System.out.println(this.din.readLine());
+		this.din.readLine();
 		String Lastmsg = "";
 		String[] job;
 
 		while(!Lastmsg.equals("NONE")){
 			this.send("REDY"); 
 			Lastmsg = this.din.readLine();
-			System.out.println("Server Message: " + Lastmsg);
+			
 			job = Lastmsg.split("\\s+");
 			if(job[0].equals("JOBN")){
-				send("GETS Avail" + " " + job[4] + " " + job[5] + " " + job[6]); 
+				send("GETS Avail" + " " + job[4] + " " + job[5] + " " + job[6]); // get memory core speed from jobn
 				serverMessage = this.din.readLine();
 				String[] serverData = serverMessage.split("\\s+");
-				int nRecs;
-				if(serverData[1].equals("0")){
+				int nRecs; 
+				if(serverData[1].equals("0")){ // data nrecs length.. no. rec = 0 so no server avail
 					send("OK");
 					serverMessage = this.din.readLine();
-					send("GETS Capable" + " " + job[4] + " " + job[5] + " " + job[6]); 
+					send("GETS Capable" + " " + job[4] + " " + job[5] + " " + job[6]); // get the capable servers inorder to queue the job
 					// send GETS message
 					serverMessage = this.din.readLine();
 					serverData = serverMessage.split("\\s+");
-					System.out.println(serverMessage);
-					nRecs = Integer.parseInt(serverData[1]);
+					
+					nRecs = Integer.parseInt(serverData[1]); // updating value of nrecs 
 					send("OK");
 					int countServer = 0;
-					for (int i = 0; i < nRecs; i += 1) {
+					for (int i = 0; i < nRecs; i += 1) { // loop nrec number of time to read everyline of the servers
 						serverMessage = this.din.readLine();
 						String[] serverInfo = serverMessage.split("\\s+");
-						if(countServer == 0){
+						if(countServer == 0){   // ensures we are only keeping the first server int he list
 							servers = serverInfo[0] + " " +serverInfo[1];
 							countServer++;
 						}
@@ -88,7 +86,7 @@ public class MyClient{
 					}
 				}
 				else{
-					nRecs = Integer.parseInt(serverData[1]);
+					nRecs = Integer.parseInt(serverData[1]); // if there is available servers
 					send("OK");
 					int countServer = 0;
 					for (int i = 0; i < nRecs; i += 1) {
@@ -105,8 +103,8 @@ public class MyClient{
 					}
 				}
 				send("OK");
-				serverMessage = this.din.readLine();
-				System.out.println("servers");
+				serverMessage = this.din.readLine(); // to rcv .
+				
 					//schedule job
 				send("SCHD" + " " + job[2] +" " +servers);
 				Lastmsg = this.din.readLine();
@@ -115,7 +113,7 @@ public class MyClient{
 				continue;
 			}
 		}
-		send("QUIT");
+		send("QUIT"); //termination line 
 		this.din.readLine();
 	}
 }
